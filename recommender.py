@@ -67,3 +67,30 @@ for i in range(len(training_data)):
                   loss.eval(session=sess, feed_dict={x: data_x, y_: data_y}))
             print("prediction:", np.matmul(data_x, sess.run(W)) + sess.run(b))
 
+# TODO testing the NN
+
+features = 1128
+df = pd.read_csv('genome-scores.csv', usecols = ['movieId','relevance'], low_memory = False)
+relevance = df.to_numpy()
+x = tf.placeholder(tf.float32,  shape=[1,features])
+y_ = tf.placeholder(tf.float32, [1])
+b = tf.Variable(tf.zeros([1]))
+y = tf.matmul(x,W) + b
+loss = tf.reduce_mean(tf.pow(y - y_, 2))
+sess = tf.Session()
+sess.run(tf.global_variables_initializer())
+for i in range(len(test_data)):
+    print("----------------------------------------------------------------------")
+    movieId = test_data[i][1]
+    data_y = [test_data[i][2]]
+    temp_mat = []
+    np.set_printoptions(suppress=True)
+    for j in range(len(relevance)):
+        if(relevance[j][0] ==movieId):
+            temp_mat.append(relevance[j][1])
+    data_x =[np.array(temp_mat)]
+    print(data_x)
+    sess.run(y, feed_dict = {x:data_x, y_:data_y})
+    print('Iteration:' ,' W:' , sess.run(W), ' b:' , sess.run(b), ' loss:', loss.eval(session=sess, feed_dict = {x:data_x, y_:data_y}))
+    print("prediction:",np.matmul(data_x,sess.run(W)) + sess.run(b))
+
